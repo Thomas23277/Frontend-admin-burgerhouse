@@ -90,7 +90,14 @@ export default function Ingredientes() {
                     </div>
                   )}
                   <div>
-                    <h3 className="font-bold text-lg text-white">{ing.nombre}</h3>
+                    <h3 className="font-bold text-lg text-white flex items-center gap-2">
+                      {ing.nombre}
+                      {ing.alergeno && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20 font-medium">
+                          ⚠️ Alérgeno
+                        </span>
+                      )}
+                    </h3>
                     <p className="text-green-400 font-bold mt-0.5">+${(ing.precio_adicional || 0).toLocaleString()}</p>
                   </div>
                 </div>

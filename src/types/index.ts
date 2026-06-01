@@ -16,6 +16,7 @@ export interface Ingrediente {
   precio_adicional: number;
   imagen_url?: string;
   disponible: boolean;
+  alergeno?: boolean;
 }
 
 export interface CategoriaNested {
@@ -30,6 +31,7 @@ export interface IngredienteNested {
   nombre: string;
   precio_adicional: number;
   imagen_url?: string;
+  alergeno?: boolean;
 }
 
 export interface Producto {

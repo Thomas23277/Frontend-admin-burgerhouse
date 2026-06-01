@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function IngredienteModal({ editando, onClose, onSave }: Props) {
-  const [form, setForm] = useState({ nombre: '', descripcion: '', precio_adicional: 0, imagen_url: '', disponible: true });
+  const [form, setForm] = useState({ nombre: '', descripcion: '', precio_adicional: 0, imagen_url: '', disponible: true, alergeno: false });
 
   useEffect(() => {
     if (editando) {
@@ -18,6 +18,7 @@ export default function IngredienteModal({ editando, onClose, onSave }: Props) {
         precio_adicional: editando.precio_adicional,
         imagen_url: editando.imagen_url || '',
         disponible: editando.disponible,
+        alergeno: editando.alergeno ?? false,
       });
     }
   }, [editando]);
@@ -53,6 +54,26 @@ export default function IngredienteModal({ editando, onClose, onSave }: Props) {
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             </div>
           )}
+
+          {/* Checkbox alérgeno */}
+          <label className="flex items-center gap-3 cursor-pointer select-none py-2">
+            <div className="relative">
+              <input
+                type="checkbox"
+                checked={form.alergeno}
+                onChange={(e) => setForm({ ...form, alergeno: e.target.checked })}
+                className="sr-only peer"
+              />
+              <div className="w-5 h-5 rounded-md border-2 border-gray-500 peer-checked:border-amber-500 peer-checked:bg-amber-500/20 transition-all flex items-center justify-center">
+                {form.alergeno && <span className="text-amber-400 text-sm font-bold">✓</span>}
+              </div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-white">⚠️ Es alérgeno</span>
+              <span className="text-xs text-gray-500">Se marcará visualmente en los productos que contengan este ingrediente</span>
+            </div>
+          </label>
+
           <div className="flex gap-3 justify-end pt-2">
             <button type="button" onClick={onClose}
               className="btn-secondary text-base px-6 py-3">Cancelar</button>
