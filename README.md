@@ -4,7 +4,7 @@ Panel de administración y empleados de **Burger House**. CRUD completo de produ
 
 ## 🎥 Video de Presentación
 
-**Link del video:** _[PENDIENTE — agregar link de YouTube cuando esté subido]_
+**Link del video:** _[https://youtu.be/YCxig3wu1N4?feature=shared]_
 
 ---
 
