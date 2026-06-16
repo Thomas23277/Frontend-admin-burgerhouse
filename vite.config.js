@@ -7,31 +7,7 @@ export default defineConfig({
   server: {
     port: 5174,
     proxy: {
-      '/auth': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/categorias': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/ingredientes': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/productos': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/usuarios': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/pedidos': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-      },
-      '/direcciones': {
+      '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
       },

@@ -31,6 +31,7 @@ export default function Navbar() {
 
   const adminLinks = [
     { path: '/admin', label: 'Dashboard', roles: ['ADMIN'] },
+    { path: '/admin/estadisticas', label: 'Estadísticas', roles: ['ADMIN'] },
     { path: '/admin/productos', label: 'Productos', roles: ['ADMIN', 'STOCK'] },
     { path: '/admin/categorias', label: 'Categorías', roles: ['ADMIN', 'STOCK'] },
     { path: '/admin/ingredientes', label: 'Ingredientes', roles: ['ADMIN', 'STOCK'] },

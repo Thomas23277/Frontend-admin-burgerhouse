@@ -13,7 +13,6 @@ const estadoColores: Record<string, string> = {
   pendiente: 'badge-yellow',
   confirmado: 'badge-blue',
   en_prep: 'badge-purple',
-  en_camino: 'badge-orange',
   entregado: 'badge-green',
   cancelado: 'badge-red',
 };
@@ -22,7 +21,6 @@ const estadoLabels: Record<string, string> = {
   pendiente: '⏳ Pendiente',
   confirmado: '✅ Confirmado',
   en_prep: '👨‍🍳 En preparación',
-  en_camino: '🚚 En camino',
   entregado: '🎉 Entregado',
   cancelado: '❌ Cancelado',
 };
@@ -30,8 +28,7 @@ const estadoLabels: Record<string, string> = {
 const estadoBtns: Record<string, { label: string; next: string; color: string } | null> = {
   pendiente: { label: '✓ Confirmar', next: 'confirmado', color: 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20' },
   confirmado: { label: '🔥 En Preparación', next: 'en_prep', color: 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20' },
-  en_prep: { label: '🚚 En Camino', next: 'en_camino', color: 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' },
-  en_camino: { label: '📦 Entregar', next: 'entregado', color: 'bg-green-500/10 text-green-400 hover:bg-green-500/20' },
+  en_prep: { label: '📦 Entregar', next: 'entregado', color: 'bg-green-500/10 text-green-400 hover:bg-green-500/20' },
   entregado: null,
   cancelado: null,
 };

@@ -34,6 +34,13 @@ export interface IngredienteNested {
   alergeno?: boolean;
 }
 
+export interface VarianteInput {
+  tipo: string;   // "talle" | "color"
+  valor: string;  // "S" | "M" | "L"
+  precio_adicional: number;
+  stock: number;
+}
+
 export interface Producto {
   id: number;
   nombre: string;
@@ -46,6 +53,7 @@ export interface Producto {
   updated_at: string;
   categorias: CategoriaNested[];
   ingredientes: IngredienteNested[];
+  variantes?: VarianteInput[];
 }
 
 export interface Usuario {
@@ -55,6 +63,21 @@ export interface Usuario {
   nombre: string;
   rol: string;
   created_at: string;
+}
+
+// ─── Cloudinary ────────────────────────────────────────────────
+
+export interface CloudinaryUploadResponse {
+  url: string;
+  secure_url: string;
+  public_id: string;
+  format?: string | null;
+  width?: number | null;
+  height?: number | null;
+}
+
+export interface CloudinaryDestroyResponse {
+  result: string;
 }
 
 export interface PedidoDetalle {
@@ -90,4 +113,62 @@ export interface PedidoCreateData {
   usuario_id: number;
   detalles: PedidoDetalleCreate[];
   notas?: string;
+}
+
+// ─── Estadísticas ──────────────────────────────────────────────
+
+export interface EstadisticasTotales {
+  total_pedidos: number;
+  total_productos: number;
+  total_clientes: number;
+  total_ingredientes: number;
+  total_categorias: number;
+}
+
+export interface PedidoPeriodoItem {
+  fecha: string;
+  cantidad: number;
+  total: number;
+}
+
+export interface PedidosPeriodoResponse {
+  pedidos: PedidoPeriodoItem[];
+}
+
+export interface PlataformaMasVendida {
+  producto_id: number;
+  nombre: string;
+  total_vendido: number;
+}
+
+export interface TicketPromedio {
+  promedio: number;
+  total_pedidos: number;
+  ingresos_totales: number;
+}
+
+export interface RankingProductoItem {
+  producto_id: number;
+  nombre: string;
+  total_vendido: number;
+  ingresos: number;
+}
+
+export interface RankingProductosResponse {
+  ranking: RankingProductoItem[];
+}
+
+export interface PedidoPorEstadoItem {
+  estado: string;
+  cantidad: number;
+}
+
+export interface PedidosPorEstadoResponse {
+  pedidos: PedidoPorEstadoItem[];
+}
+
+export interface IngresosResponse {
+  total_ingresos: number;
+  cantidad_pedidos: number;
+  promedio: number;
 }

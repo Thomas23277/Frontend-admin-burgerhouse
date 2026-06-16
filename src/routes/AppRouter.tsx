@@ -8,6 +8,7 @@ import Ingredientes from '../pages/Ingredientes';
 import Productos from '../pages/Productos';
 import Pedidos from '../pages/Pedidos';
 import Usuarios from '../pages/Usuarios';
+import Estadisticas from '../pages/Estadisticas';
 import Login from '../pages/Login';
 
 export default function AppRouter() {
@@ -83,6 +84,14 @@ export default function AppRouter() {
             element={
               <ProtectedRoute roles={['ADMIN']}>
                 <Usuarios />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/estadisticas"
+            element={
+              <ProtectedRoute roles={['ADMIN']}>
+                <Estadisticas />
               </ProtectedRoute>
             }
           />
