@@ -93,7 +93,7 @@ export default function CategoriaModal({ editando, categorias, onClose, onSave }
             >
               <option value="">— Ninguna (categoría raíz) —</option>
               {(categorias ?? [])
-                .filter((c) => !editando || c.id !== editando.id) // evitar auto-referencia
+                .filter((c) => !editando || c.id !== editando.id)
                 .map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.nombre}
@@ -101,7 +101,6 @@ export default function CategoriaModal({ editando, categorias, onClose, onSave }
                 ))}
             </select>
           </div>
-
           {/* ── Cloudinary Upload ── */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Imagen de la categoría</label>
