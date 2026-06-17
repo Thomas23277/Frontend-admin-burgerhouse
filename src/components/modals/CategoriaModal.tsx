@@ -4,11 +4,12 @@ import * as cloudinaryService from '../../services/cloudinary';
 
 interface Props {
   editando?: Categoria | null;
+  categorias?: Categoria[];       // lista completa para elegir categoría padre
   onClose: () => void;
   onSave: (data: Partial<Categoria>) => void;
 }
 
-export default function CategoriaModal({ editando, onClose, onSave }: Props) {
+export default function CategoriaModal({ editando, categorias, onClose, onSave }: Props) {
   const [form, setForm] = useState({ nombre: '', descripcion: '', imagen_url: '', parent_id: undefined as number | undefined, es_activa: true });
   const [subiendoImg, setSubiendoImg] = useState(false);
   const [imgError, setImgError] = useState<string | null>(null);
@@ -80,6 +81,26 @@ export default function CategoriaModal({ editando, onClose, onSave }: Props) {
             onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
             className="input" rows={3} />
 
+          {/* ── Categoría Padre ── */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Categoría padre <span className="text-gray-500">(opcional)</span>
+            </label>
+            <select
+              value={form.parent_id ?? ''}
+              onChange={(e) => setForm({ ...form, parent_id: e.target.value ? Number(e.target.value) : undefined })}
+              className="input"
+            >
+              <option value="">— Ninguna (categoría raíz) —</option>
+              {(categorias ?? [])
+                .filter((c) => !editando || c.id !== editando.id)
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.nombre}
+                  </option>
+                ))}
+            </select>
+          </div>
           {/* ── Cloudinary Upload ── */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">Imagen de la categoría</label>

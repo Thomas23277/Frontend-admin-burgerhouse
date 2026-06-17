@@ -10,57 +10,44 @@ gestión de pedidos con máquina de estados, variantes de producto, y notificaci
 
 ## 📦 Stack Tecnológico
 
-| Capa         | Tecnología                                               |
-|-------------|----------------------------------------------------------|
-| Backend      | Python 3.14, FastAPI, SQLModel, Pydantic v2             |
-| Frontend     | React 19, TypeScript 5 (strict), Vite 8, Tailwind CSS 4 |
-| Estado Global | Zustand 5                                                |
-| Datos        | PostgreSQL (producción) / SQLite (desarrollo)            |
-| Pagos        | MercadoPago Checkout PRO (SDK Python + CardPayment)     |
-| Imágenes     | Cloudinary (CDN + upload signed)                        |
-| Tiempo Real  | WebSocket nativo FastAPI                                 |
-| Tests        | pytest + TestClient (httpx)                              |
+- **React 18** — Biblioteca de interfaces
+- **Vite 8** — Build tool (Rolldown)
+- **TanStack Query** — Server state (caché, sync, mutations)
+- **React Router** — Navegación SPA con protección por roles
+- **Axios** — Cliente HTTP con interceptor
+- **Tailwind CSS** — Estilos
 
----
-
-## 🚀 Setup Rápido
+## 🚀 Ejecución
 
 ### Requisitos
 
-- Python 3.12+
-- Node.js 22+
-- pnpm (recomendado) o npm
-- PostgreSQL 16+ (opcional, default SQLite)
+- Node.js 20+
+- npm 10+
 
-### 1. Backend
+### Instalación
 
 ```bash
-# Ir al directorio del backend
-cd Backend-burgerhouse
+cd Frontend-admin-burgerhouse
+npm install
 
-# Crear entorno virtual
-python -m venv venv
-
-# Activar (Windows)
-.\venv\Scripts\Activate.ps1
-# Activar (Linux/Mac)
-# source venv/bin/activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Configurar variables de entorno
-# Copiar y editar:
-cp .env.example .env
-# Editar .env con tus credenciales (ver sección de configuración)
-
-# Iniciar servidor (desarrollo con recarga automática)
-uvicorn app.main:app --reload --port 8000
+# Copiar y revisar variables de entorno (opcional, defaults funcionan con proxy)
+copy .env.example .env
 ```
 
-El backend arranca en **http://localhost:8000**.
-- Documentación interactiva: http://localhost:8000/docs (Swagger UI)
-- Documentación alternativa: http://localhost:8000/redoc
+### Ejecutar desarrollo (con proxy al backend)
+
+```bash
+# Backend debe estar corriendo en http://localhost:8000
+npm run dev
+```
+
+### Build producción
+
+```bash
+npm run build
+```
+
+Disponible en: http://localhost:5174
 
 Al iniciar por primera vez:
 1. Crea todas las tablas automáticamente (`create_all()`)
@@ -280,3 +267,51 @@ Mostrar:
 4. Panel admin: CRUD productos, gestión pedidos, estadísticas
 5. Subida de imagen a Cloudinary
 
+| Ruta | Página | Roles |
+|------|--------|-------|
+| `/admin` | Dashboard | ADMIN |
+| `/admin/productos` | CRUD Productos | ADMIN, STOCK |
+| `/admin/categorias` | CRUD Categorías | ADMIN, STOCK |
+| `/admin/ingredientes` | CRUD Ingredientes | ADMIN, STOCK |
+| `/admin/pedidos` | Gestión de pedidos con FSM | ADMIN, PEDIDOS |
+| `/admin/usuarios` | CRUD Usuarios | ADMIN |
+| `/empleado` | Panel empleado | PEDIDOS, STOCK |
+| `/login` | Inicio de sesión | Público |
+
+## 🧠 Gestión de Pedidos
+
+El panel de pedidos implementa la máquina de estados:
+
+```
+pendiente → confirmado → en_prep → entregado
+    ↓           ↓           ↓
+ cancelado   cancelado   cancelado
+```
+
+- **Transiciones inválidas** son rechazadas por el backend con 400
+- **Estados terminales** (entregado, cancelado) no pueden modificarse
+
+## 🔐 Roles
+
+| Rol | Código | Acceso |
+|-----|--------|--------|
+| Administrador | ADMIN | Todo el panel |
+| Gestor de Stock | STOCK | Productos, categorías, ingredientes |
+| Gestor de Pedidos | PEDIDOS | Pedidos |
+| Cliente | CLIENT | Sin acceso al admin |
+
+## 👤 Credenciales de Prueba
+
+| Usuario | Email | Contraseña | Rol |
+|---------|-------|------------|-----|
+| `admin` | `admin@burger.com` | `Admin123!` | ADMIN (acceso completo) |
+
+> Los usuarios se crean automáticamente via seed en el backend al iniciarlo.
+
+## 🌐 Variables de Entorno
+
+Ver `.env.example`:
+
+| Variable | Default | Descripción |
+|----------|---------|-------------|
+| `VITE_API_URL` | `/api/v1` | URL base de la API |
