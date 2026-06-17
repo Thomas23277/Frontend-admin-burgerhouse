@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import * as usuariosService from '../services/usuarios';
 import UsuarioModal from '../components/modals/UsuarioModal';
+import EditarRolModal from '../components/modals/EditarRolModal';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import EmptyState from '../components/ui/EmptyState';
 
@@ -15,6 +16,7 @@ const rolBadge: Record<string, string> = {
 export default function Usuarios() {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<{ id: number; username: string; nombre: string; rol: string } | null>(null);
 
   const { data: usuarios, isLoading } = useQuery({
     queryKey: ['usuarios'],
@@ -24,6 +26,11 @@ export default function Usuarios() {
   const createMut = useMutation({
     mutationFn: usuariosService.createUsuario,
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['usuarios'] }); setModalOpen(false); },
+  });
+
+  const updateRolMut = useMutation({
+    mutationFn: ({ id, rol }: { id: number; rol: string }) => usuariosService.updateUsuario(id, { rol }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['usuarios'] }); setEditingUser(null); },
   });
 
   if (isLoading) return <LoadingSpinner text="Cargando usuarios..." />;
@@ -64,7 +71,13 @@ export default function Usuarios() {
                     </span>
                   </div>
                 </div>
-                <p className="text-gray-500 text-sm flex-shrink-0">{new Date(u.created_at).toLocaleDateString()}</p>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <button onClick={() => setEditingUser({ id: u.id, username: u.username, nombre: u.nombre, rol: u.rol })}
+                    className="text-sm text-amber-400 hover:text-amber-300 font-medium transition-colors">
+                    Editar rol
+                  </button>
+                  <p className="text-gray-500 text-sm">{new Date(u.created_at).toLocaleDateString()}</p>
+                </div>
               </div>
             ))
           )}
@@ -72,6 +85,16 @@ export default function Usuarios() {
 
         {modalOpen && (
           <UsuarioModal onClose={() => setModalOpen(false)} onSave={(data) => createMut.mutate(data)} />
+        )}
+
+        {editingUser && (
+          <EditarRolModal
+            username={editingUser.username}
+            nombre={editingUser.nombre}
+            rolActual={editingUser.rol}
+            onClose={() => setEditingUser(null)}
+            onSave={(rol) => updateRolMut.mutate({ id: editingUser.id, rol })}
+          />
         )}
       </div>
     </div>

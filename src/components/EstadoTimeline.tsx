@@ -6,7 +6,6 @@ const estadoIconos: Record<string, string> = {
   pendiente: '🕐',
   confirmado: '✅',
   en_prep: '🔥',
-  en_camino: '🚚',
   entregado: '📦',
   cancelado: '❌',
 };
@@ -15,7 +14,6 @@ const estadoColores: Record<string, string> = {
   pendiente: 'border-yellow-500/30 text-yellow-400',
   confirmado: 'border-blue-500/30 text-blue-400',
   en_prep: 'border-purple-500/30 text-purple-400',
-  en_camino: 'border-orange-500/30 text-orange-400',
   entregado: 'border-green-500/30 text-green-400',
   cancelado: 'border-red-500/30 text-red-400',
 };
@@ -24,7 +22,6 @@ const estadoBg: Record<string, string> = {
   pendiente: 'bg-yellow-500/15',
   confirmado: 'bg-blue-500/15',
   en_prep: 'bg-purple-500/15',
-  en_camino: 'bg-orange-500/15',
   entregado: 'bg-green-500/15',
   cancelado: 'bg-red-500/15',
 };
@@ -33,7 +30,6 @@ const estadoLabels: Record<string, string> = {
   pendiente: 'Pendiente',
   confirmado: 'Confirmado',
   en_prep: 'En Preparación',
-  en_camino: 'En Camino',
   entregado: 'Entregado',
   cancelado: 'Cancelado',
 };

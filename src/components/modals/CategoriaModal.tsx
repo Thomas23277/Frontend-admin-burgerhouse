@@ -1,14 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Categoria } from '../../types';
+import * as cloudinaryService from '../../services/cloudinary';
 
 interface Props {
   editando?: Categoria | null;
+  categorias?: Categoria[];       // lista completa para elegir categoría padre
   onClose: () => void;
   onSave: (data: Partial<Categoria>) => void;
 }
 
-export default function CategoriaModal({ editando, onClose, onSave }: Props) {
+export default function CategoriaModal({ editando, categorias, onClose, onSave }: Props) {
   const [form, setForm] = useState({ nombre: '', descripcion: '', imagen_url: '', parent_id: undefined as number | undefined, es_activa: true });
+  const [subiendoImg, setSubiendoImg] = useState(false);
+  const [imgError, setImgError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (editando) {
@@ -21,6 +26,39 @@ export default function CategoriaModal({ editando, onClose, onSave }: Props) {
       });
     }
   }, [editando]);
+
+  const subirImagen = async (file: File) => {
+    if (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type)) {
+      setImgError('Formato no permitido. Usá JPG, PNG, WebP o GIF.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setImgError('La imagen es muy grande. Máximo 10 MB.');
+      return;
+    }
+
+    setSubiendoImg(true);
+    setImgError(null);
+
+    try {
+      const result = await cloudinaryService.uploadImagen(file);
+      setForm((prev: any) => ({ ...prev, imagen_url: result.secure_url }));
+    } catch (err: any) {
+      setImgError(err?.message || 'Error al subir la imagen');
+    } finally {
+      setSubiendoImg(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) subirImagen(file);
+  };
+
+  const quitarImagen = () => {
+    setForm((prev: any) => ({ ...prev, imagen_url: '' }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,15 +80,72 @@ export default function CategoriaModal({ editando, onClose, onSave }: Props) {
           <textarea placeholder="Descripción" value={form.descripcion}
             onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
             className="input" rows={3} />
-          <input type="url" placeholder="URL de la imagen" value={form.imagen_url}
-            onChange={(e) => setForm({ ...form, imagen_url: e.target.value })}
-            className="input" />
-          {form.imagen_url && (
-            <div className="relative w-full h-32 rounded-xl overflow-hidden bg-white/5">
-              <img src={form.imagen_url} alt="Preview" className="w-full h-full object-cover"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-            </div>
-          )}
+
+          {/* ── Categoría Padre ── */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Categoría padre <span className="text-gray-500">(opcional)</span>
+            </label>
+            <select
+              value={form.parent_id ?? ''}
+              onChange={(e) => setForm({ ...form, parent_id: e.target.value ? Number(e.target.value) : undefined })}
+              className="input"
+            >
+              <option value="">— Ninguna (categoría raíz) —</option>
+              {(categorias ?? [])
+                .filter((c) => !editando || c.id !== editando.id) // evitar auto-referencia
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.nombre}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* ── Cloudinary Upload ── */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">Imagen de la categoría</label>
+            {form.imagen_url ? (
+              <div className="relative w-full h-32 rounded-xl overflow-hidden bg-white/5 group">
+                <img src={form.imagen_url} alt="Preview" className="w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                  <button type="button" onClick={() => fileInputRef.current?.click()}
+                    className="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium transition cursor-pointer">
+                    🔄 Cambiar
+                  </button>
+                  <button type="button" onClick={quitarImagen}
+                    className="px-4 py-2 rounded-lg bg-red-500/40 hover:bg-red-500/60 text-white text-sm font-medium transition cursor-pointer">
+                    🗑️ Quitar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className={`relative w-full h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-2 transition cursor-pointer
+                  ${subiendoImg
+                    ? 'border-amber-400 bg-amber-500/10'
+                    : 'border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-amber-500/5'
+                  }`}>
+                {subiendoImg ? (
+                  <>
+                    <div className="w-8 h-8 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                    <span className="text-sm text-amber-400 font-medium">Subiendo imagen...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl">📸</span>
+                    <span className="text-sm text-gray-400">Hacé clic para subir una imagen</span>
+                    <span className="text-xs text-gray-500">JPG, PNG, WebP o GIF — Máx 10 MB</span>
+                  </>
+                )}
+              </div>
+            )}
+            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleFileChange} className="hidden" />
+            {imgError && <p className="mt-2 text-sm text-red-400">{imgError}</p>}
+          </div>
+
           <div className="flex gap-3 justify-end pt-2">
             <button type="button" onClick={onClose}
               className="btn-secondary text-base px-6 py-3">Cancelar</button>

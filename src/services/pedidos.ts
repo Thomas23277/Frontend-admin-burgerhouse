@@ -16,6 +16,10 @@ export const createPedido = (data: PedidoCreateData) =>
 export const updatePedido = (id: number, data: Partial<Pedido>) =>
   apiClient.put<Pedido>(`/pedidos/${id}`, data).then((r) => r.data);
 
+/** Avanza el pedido al siguiente estado según la máquina de estados (backend decide). */
+export const siguienteEstado = (id: number) =>
+  apiClient.put<Pedido>(`/pedidos/${id}/siguiente-estado`).then((r) => r.data);
+
 export interface HistorialEstado {
   id: number;
   estado_anterior: string | null;

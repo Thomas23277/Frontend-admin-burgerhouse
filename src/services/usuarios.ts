@@ -6,3 +6,6 @@ export const getUsuarios = () =>
 
 export const createUsuario = (data: Partial<Usuario & { password: string }>) =>
   apiClient.post<Usuario>('/usuarios', data).then((r) => r.data);
+
+export const updateUsuario = (id: number, data: { rol: string }) =>
+  apiClient.put<Usuario>(`/usuarios/${id}`, data).then((r) => r.data);

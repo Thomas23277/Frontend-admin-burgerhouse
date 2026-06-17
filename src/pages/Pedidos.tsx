@@ -13,7 +13,6 @@ const estadoColores: Record<string, string> = {
   pendiente: 'badge-yellow',
   confirmado: 'badge-blue',
   en_prep: 'badge-purple',
-  en_camino: 'badge-orange',
   entregado: 'badge-green',
   cancelado: 'badge-red',
 };
@@ -22,7 +21,6 @@ const estadoLabels: Record<string, string> = {
   pendiente: '⏳ Pendiente',
   confirmado: '✅ Confirmado',
   en_prep: '👨‍🍳 En preparación',
-  en_camino: '🚚 En camino',
   entregado: '🎉 Entregado',
   cancelado: '❌ Cancelado',
 };
@@ -30,8 +28,7 @@ const estadoLabels: Record<string, string> = {
 const estadoBtns: Record<string, { label: string; next: string; color: string } | null> = {
   pendiente: { label: '✓ Confirmar', next: 'confirmado', color: 'bg-blue-500/10 text-blue-400 hover:bg-blue-500/20' },
   confirmado: { label: '🔥 En Preparación', next: 'en_prep', color: 'bg-purple-500/10 text-purple-400 hover:bg-purple-500/20' },
-  en_prep: { label: '🚚 En Camino', next: 'en_camino', color: 'bg-orange-500/10 text-orange-400 hover:bg-orange-500/20' },
-  en_camino: { label: '📦 Entregar', next: 'entregado', color: 'bg-green-500/10 text-green-400 hover:bg-green-500/20' },
+  en_prep: { label: '📦 Entregar', next: 'entregado', color: 'bg-green-500/10 text-green-400 hover:bg-green-500/20' },
   entregado: null,
   cancelado: null,
 };
@@ -57,6 +54,13 @@ export default function Pedidos() {
   const updateMut = useMutation({
     mutationFn: ({ id, data }: { id: number; data: any }) => pedidosService.updatePedido(id, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pedidos'] }),
+    onError: (err: Error) => alert(err.message || 'Error al actualizar pedido'),
+  });
+
+  const siguienteEstadoMut = useMutation({
+    mutationFn: pedidosService.siguienteEstado,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pedidos'] }),
+    onError: (err: Error) => alert(err.message || 'Error al avanzar estado'),
   });
 
   const createMut = useMutation({
@@ -110,14 +114,21 @@ export default function Pedidos() {
                 <div className="flex flex-wrap gap-2">
                   {estadoBtns[pedido.estado] && (
                     <button
-                      onClick={() => updateMut.mutate({ id: pedido.id, data: { estado: estadoBtns[pedido.estado]!.next } })}
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${estadoBtns[pedido.estado]!.color}`}
+                      type="button"
+                      onClick={() => siguienteEstadoMut.mutate(pedido.id)}
+                      disabled={siguienteEstadoMut.isPending}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${estadoBtns[pedido.estado]!.color}`}
                     >
-                      {estadoBtns[pedido.estado]!.label}
+                      {siguienteEstadoMut.isPending ? '⏳...' : estadoBtns[pedido.estado]!.label}
                     </button>
                   )}
                   {pedido.estado !== 'entregado' && pedido.estado !== 'cancelado' && (
-                    <button onClick={() => updateMut.mutate({ id: pedido.id, data: { estado: 'cancelado' } })}
+                    <button type="button"
+                      onClick={() => {
+                        if (confirm('¿Cancelar este pedido? Esta acción no se puede deshacer.')) {
+                          updateMut.mutate({ id: pedido.id, data: { estado: 'cancelado' } });
+                        }
+                      }}
                       className="px-4 py-2 rounded-xl bg-red-500/10 text-red-400 hover:bg-red-500/20 text-sm font-medium transition cursor-pointer">
                       ✕ Cancelar
                     </button>
@@ -126,7 +137,7 @@ export default function Pedidos() {
 
                 {/* Timeline toggle */}
                 <div className="mt-4 pt-3 border-t border-white/5">
-                  <button
+                  <button type="button"
                     onClick={() => setTimelineOpen((prev) => ({ ...prev, [pedido.id]: !prev[pedido.id] }))}
                     className="text-sm text-gray-500 hover:text-amber-400 transition flex items-center gap-1.5 cursor-pointer"
                   >

@@ -50,6 +50,58 @@ export default function Categorias() {
     }
   };
 
+  // ── Render recursivo de categorías ──────────────────────
+  const renderCategoria = (cat: Categoria, depth = 0) => (
+    <div key={cat.id}>
+      <div
+        className="card p-5 flex justify-between items-center gap-4"
+        style={{ marginLeft: depth * 24 }}
+      >
+        <div className="flex items-center gap-4">
+          {cat.imagen_url ? (
+            <div className="w-14 h-14 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
+              <img src={cat.imagen_url} alt={cat.nombre} className="w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            </div>
+          ) : (
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center text-2xl flex-shrink-0">
+              {depth === 0 ? '📁' : '📂'}
+            </div>
+          )}
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-bold text-lg text-white">{cat.nombre}</h3>
+              {depth > 0 && (
+                <span className="badge badge-gray text-[10px]">subcategoría</span>
+              )}
+              {cat.es_principal && (
+                <span className="badge badge-amber text-[10px]">⭐ Principal</span>
+              )}
+            </div>
+            <p className="text-gray-400 text-sm mt-0.5">{cat.descripcion}</p>
+          </div>
+        </div>
+        {esAdmin && (
+          <div className="flex gap-2 flex-shrink-0">
+            <button onClick={() => handleEdit(cat)}
+              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-sm font-medium transition cursor-pointer">
+              ✏️ Editar
+            </button>
+            <button onClick={() => deleteMut.mutate(cat.id)}
+              className="btn-danger text-sm px-4 py-2">
+              🗑️
+            </button>
+          </div>
+        )}
+      </div>
+      {cat.subcategorias && cat.subcategorias.length > 0 && (
+        <div className="space-y-3 mt-3">
+          {cat.subcategorias.map((sub) => renderCategoria(sub, depth + 1))}
+        </div>
+      )}
+    </div>
+  );
+
   if (isLoading) return <LoadingSpinner text="Cargando categorías..." />;
 
   return (
@@ -73,49 +125,15 @@ export default function Categorias() {
         </div>
 
         <div className="space-y-4 stagger">
-          {categorias?.length === 0 ? (
+          {(!categorias || categorias.length === 0) ? (
             <EmptyState icon="📁" title="No hay categorías todavía" subtitle="Crea tu primera categoría para empezar" />
           ) : (
-            categorias?.map((cat) => (
-              <div key={cat.id} className="card p-5 flex justify-between items-center gap-4">
-                <div className="flex items-center gap-4">
-                  {cat.imagen_url ? (
-                    <div className="w-16 h-16 rounded-xl overflow-hidden bg-white/5 flex-shrink-0">
-                      <img src={cat.imagen_url} alt={cat.nombre} className="w-full h-full object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/10 flex items-center justify-center text-2xl flex-shrink-0">
-                      📁
-                    </div>
-                  )}
-                  <div>
-                    <h3 className="font-bold text-lg text-white">{cat.nombre}</h3>
-                    <p className="text-gray-400 text-sm mt-0.5">{cat.descripcion}</p>
-                    {cat.es_principal && (
-                      <span className="badge badge-amber text-[10px] mt-1 inline-block">⭐ Principal</span>
-                    )}
-                  </div>
-                </div>
-                {esAdmin && (
-                  <div className="flex gap-2 flex-shrink-0">
-                    <button onClick={() => handleEdit(cat)}
-                      className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-sm font-medium transition cursor-pointer">
-                      ✏️ Editar
-                    </button>
-                    <button onClick={() => deleteMut.mutate(cat.id)}
-                      className="btn-danger text-sm px-4 py-2">
-                      🗑️
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
+            categorias.map((cat) => renderCategoria(cat))
           )}
         </div>
 
         {modalOpen && (
-          <CategoriaModal editando={editando} onClose={() => { setModalOpen(false); setEditando(null); }} onSave={handleSave} />
+          <CategoriaModal editando={editando} categorias={categorias} onClose={() => { setModalOpen(false); setEditando(null); }} onSave={handleSave} />
         )}
       </div>
     </div>

@@ -1,13 +1,10 @@
 import {
   createContext,
   useContext,
-  useState,
-  useEffect,
-  useCallback,
   type ReactNode,
 } from 'react';
 import type { UserResponse, LoginRequest, RegisterRequest } from '../services/auth';
-import * as authService from '../services/auth';
+import { useAuthStore } from '../store/authStore';
 
 interface AuthContextType {
   user: UserResponse | null;
@@ -21,55 +18,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<UserResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+function useStore(): AuthContextType {
+  const user = useAuthStore((s) => s.user);
+  const loading = useAuthStore((s) => s.loading);
 
-  // Check session on mount (cookie may still be valid)
-  useEffect(() => {
-    authService
-      .getMe()
-      .then((u) => setUser(u))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const login = useCallback(async (data: LoginRequest) => {
-    const resp = await authService.login(data);
-    setUser(resp.usuario);
-  }, []);
-
-  const register = useCallback(async (data: RegisterRequest) => {
-    const usuario = await authService.register(data);
-    // After register, login automatically
-    await login({ email: data.email, password: data.password });
-  }, [login]);
-
-  const logout = useCallback(async () => {
-    await authService.logout();
-    setUser(null);
-  }, []);
-
-  const hasRole = useCallback(
-    (...roles: string[]) => {
+  return {
+    user,
+    loading,
+    login: useAuthStore.getState().login,
+    register: useAuthStore.getState().register,
+    logout: useAuthStore.getState().logout,
+    isAuthenticated: user !== null,
+    hasRole: (...roles: string[]) => {
       if (!user) return false;
       return roles.map((r) => r.toUpperCase()).includes(user.rol.toUpperCase());
     },
-    [user],
-  );
+  };
+}
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const value = useStore();
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        isAuthenticated: !!user,
-        hasRole,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
