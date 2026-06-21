@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Usuario, Producto } from '../../types';
 
 interface DetalleForm {
@@ -33,7 +34,7 @@ export default function PedidoModal({ productos, usuarios, onClose, onSave }: Pr
     onSave({ ...form, usuario_id: parseInt(form.usuario_id) });
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <form onSubmit={handleSubmit} className="card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 animate-fadeInUp">
         <h2 className="text-2xl font-bold mb-6">
@@ -78,6 +79,7 @@ export default function PedidoModal({ productos, usuarios, onClose, onSave }: Pr
           </div>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,15 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ProtectedRoute from '../components/ProtectedRoute';
-import AdminDashboard from '../pages/admin/Dashboard';
-import EmpleadoDashboard from '../pages/EmpleadoDashboard';
-import Categorias from '../pages/Categorias';
-import Ingredientes from '../pages/Ingredientes';
-import Productos from '../pages/Productos';
-import Pedidos from '../pages/Pedidos';
-import Usuarios from '../pages/Usuarios';
-import Estadisticas from '../pages/Estadisticas';
-import Login from '../pages/Login';
+import AdminDashboard from '../features/admin/Dashboard';
+import EmpleadoDashboard from '../features/employee/EmpleadoDashboard';
+import Categorias from '../features/products/Categorias';
+import Ingredientes from '../features/products/Ingredientes';
+import Productos from '../features/products/Productos';
+import Pedidos from '../features/orders/Pedidos';
+import Usuarios from '../features/users/Usuarios';
+import Estadisticas from '../features/stats/Estadisticas';
+import Login from '../features/auth/Login';
 
 export default function AppRouter() {
   return (

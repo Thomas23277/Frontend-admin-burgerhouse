@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   onClose: () => void;
@@ -13,7 +14,7 @@ export default function UsuarioModal({ onClose, onSave }: Props) {
     onSave(form);
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <form onSubmit={handleSubmit} className="card w-full max-w-lg p-8 animate-fadeInUp">
         <h2 className="text-2xl font-bold mb-6">
@@ -47,6 +48,7 @@ export default function UsuarioModal({ onClose, onSave }: Props) {
           </div>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   username: string;
@@ -16,7 +17,7 @@ export default function EditarRolModal({ username, nombre, rolActual, onClose, o
     onSave(rol);
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={onClose}>
       <form onSubmit={handleSubmit} className="card w-full max-w-md p-8 animate-fadeInUp"
@@ -46,6 +47,7 @@ export default function EditarRolModal({ username, nombre, rolActual, onClose, o
             className="btn-primary text-base px-6 py-3">Guardar</button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }

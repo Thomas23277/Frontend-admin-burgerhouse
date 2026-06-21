@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Producto, Categoria, Ingrediente } from '../../types';
 import * as cloudinaryService from '../../services/cloudinary';
 
@@ -106,7 +107,7 @@ export default function ProductoModal({ editando, categorias, ingredientes, onCl
     });
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <form onSubmit={handleSubmit} className="card w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 animate-fadeInUp">
         <h2 className="text-2xl font-bold mb-6">
@@ -305,6 +306,7 @@ export default function ProductoModal({ editando, categorias, ingredientes, onCl
           </div>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body
   );
 }
